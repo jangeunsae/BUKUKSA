@@ -9,6 +9,7 @@ import UIKit
 
 class ViewController: UIViewController {
     
+<<<<<<< HEAD
     private let searchingView = SearchingView()
     
     
