@@ -4,9 +4,6 @@
 //
 //  Created by 장은새 on 7/15/25.
 //
-
-<<<<<<< HEAD
-
 import UIKit
 import SnapKit
 
@@ -168,6 +165,3 @@ extension ListView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayo
         return CGSize(width: 120, height: 170)
     }
 }
-=======
-import Foundation
->>>>>>> origin/jangeunsae

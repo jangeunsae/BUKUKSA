@@ -8,6 +8,8 @@ import UIKit
 import SnapKit
 
 class HomeViewController: UIViewController {
+    
+    private let searchingView = SearchingView()
    
     // 제목 레이블
     private let titleLabel: UILabel = {
@@ -43,6 +45,10 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        
+        view.addSubview(searchingView)
+        searchingView.snp.makeConstraints { make in            make.edges.equalTo(view.safeAreaLayoutGuide)
+        }
 
         // 이미지 뷰 및 제목 레이블 추가
         view.addSubview(bokuksaImageView)
