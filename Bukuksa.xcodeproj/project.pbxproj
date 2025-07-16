@@ -10,10 +10,12 @@
 		A80502EF2E266CF1002354C1 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = A80502EE2E266CF1002354C1 /* SnapKit */; };
 		A80502F22E266CFC002354C1 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = A80502F12E266CFC002354C1 /* Alamofire */; };
 		A80502F52E266D04002354C1 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = A80502F42E266D04002354C1 /* Kingfisher */; };
+		B5AE54A92E2760850052DB20 /* MovieCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5AE54A82E2760850052DB20 /* MovieCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		A80502D22E266BF8002354C1 /* Bukuksa.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bukuksa.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B5AE54A82E2760850052DB20 /* MovieCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -54,6 +56,7 @@
 		A80502C92E266BF8002354C1 = {
 			isa = PBXGroup;
 			children = (
+				B5AE54A82E2760850052DB20 /* MovieCell.swift */,
 				A80502D42E266BF8002354C1 /* Bukuksa */,
 				A80502D32E266BF8002354C1 /* Products */,
 			);
@@ -149,6 +152,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5AE54A92E2760850052DB20 /* MovieCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
