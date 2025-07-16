@@ -8,168 +8,267 @@ import UIKit
 import SnapKit
 
 class HomeViewController: UIViewController {
-   
-    // 제목 레이블
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "bukuksa"  // 제목 텍스트 설정
-        label.font = UIFont.boldSystemFont(ofSize: 20)  // 굵은 글씨, 크기 20
-        label.textColor = UIColor.systemBlue  // 파란색 텍스트
-        return label
-    }()
-
-    // 버튼들
+    
     let movieListButton = UIButton(type: .system)
     let searchButton = UIButton(type: .system)
     let profileButton = UIButton(type: .system)
-
-    // 버튼 밑줄 뷰들
+    
     let movieListUnderline = UIView()
     let searchUnderline = UIView()
     let profileUnderline = UIView()
     
-    // 컨텐츠를 담을 뷰
-    let containerView = UIView()
-
-    // bukuksa 이미지 뷰
-    let bokuksaImageView: UIImageView = {
-        let iv = UIImageView()
-        iv.image = UIImage(named: "bokuksa")
-        iv.contentMode = .scaleAspectFit
-        iv.clipsToBounds = true
-        return iv
+    private let bannerImageView: UIImageView = {
+        let imageView = UIImageView()
+        let image = UIImage(named: "BannerImage")
+        imageView.image = image
+        imageView.contentMode = UIView.ContentMode.scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 8
+        return imageView
     }()
 
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
+    
+    private let categoryTitles = ["인기 영화", "현재 상영작", "평점 높은 작품", "개봉 예정작"]
+    private var categoryButtons: [UIButton] = []
+    private var collectionViews: [UICollectionView] = []
+    
+    private let dummyMovieCount = 10
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-
-        // 이미지 뷰 및 제목 레이블 추가
-        view.addSubview(bokuksaImageView)
-        view.addSubview(titleLabel)
-        bokuksaImageView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(5)  // 안전 영역 위에서 5pt 아래
-            make.leading.equalToSuperview().offset(40)  // 왼쪽에서 40pt 떨어짐
-            make.height.width.equalTo(50)  // 50x50 크기
-        }
-        titleLabel.snp.makeConstraints { make in
-            make.leading.equalTo(bokuksaImageView.snp.trailing).offset(8)  // 이미지 오른쪽 8pt 띄움
-            make.centerY.equalTo(bokuksaImageView)  // 이미지와 수직 가운데 정렬
-        }
-
-        setupButtons()  // 버튼 설정
-        setupContainerView()  // 컨테이너 뷰 설정
-        updateSelectedButton(movieListButton)  // 초기 선택 상태
-        showMovieList()  // 초기 화면: 영화목록
+        
+        setupButtons()
+        setupListView()
+        updateSelectedButton(movieListButton)
     }
-
-    func setupButtons() {
-        // 버튼들을 수평 스택뷰에 담기
+    
+    private func setupButtons() {
         let buttonStack = UIStackView(arrangedSubviews: [movieListButton, searchButton, profileButton])
         buttonStack.axis = .horizontal
         buttonStack.distribution = .fillEqually
-
+        
         view.addSubview(buttonStack)
-        buttonStack.snp.makeConstraints {
-            $0.top.equalTo(bokuksaImageView.snp.bottom).offset(20)  // 이미지 아래 20pt
-            $0.leading.trailing.equalToSuperview()  // 좌우 꽉 채움
-            $0.height.equalTo(44)  // 높이 44pt
+        
+        buttonStack.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(5) // safeArea 기준으로 위치 조정
+            make.leading.trailing.equalToSuperview()
+            make.height.equalTo(44)
         }
-
-        // 버튼 타이틀 설정
+        
         movieListButton.setTitle("영화목록", for: .normal)
         searchButton.setTitle("영화검색", for: .normal)
         profileButton.setTitle("마이페이지", for: .normal)
-
-        // 버튼 액션 연결
+        
         movieListButton.addTarget(self, action: #selector(showMovieList), for: .touchUpInside)
         searchButton.addTarget(self, action: #selector(showSearch), for: .touchUpInside)
         profileButton.addTarget(self, action: #selector(showProfile), for: .touchUpInside)
-
-        // 밑줄 뷰 초기 설정
+        
         [movieListUnderline, searchUnderline, profileUnderline].forEach {
             $0.backgroundColor = .systemBlue
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
-
-        // 각 버튼에 밑줄 뷰 추가
+        
         movieListButton.addSubview(movieListUnderline)
         searchButton.addSubview(searchUnderline)
         profileButton.addSubview(profileUnderline)
-
-        // 밑줄 위치 및 크기 제약
+        
         NSLayoutConstraint.activate([
             movieListUnderline.heightAnchor.constraint(equalToConstant: 2),
             movieListUnderline.leadingAnchor.constraint(equalTo: movieListButton.leadingAnchor),
             movieListUnderline.trailingAnchor.constraint(equalTo: movieListButton.trailingAnchor),
             movieListUnderline.bottomAnchor.constraint(equalTo: movieListButton.bottomAnchor),
-
+            
             searchUnderline.heightAnchor.constraint(equalToConstant: 2),
             searchUnderline.leadingAnchor.constraint(equalTo: searchButton.leadingAnchor),
             searchUnderline.trailingAnchor.constraint(equalTo: searchButton.trailingAnchor),
             searchUnderline.bottomAnchor.constraint(equalTo: searchButton.bottomAnchor),
-
+            
             profileUnderline.heightAnchor.constraint(equalToConstant: 2),
             profileUnderline.leadingAnchor.constraint(equalTo: profileButton.leadingAnchor),
             profileUnderline.trailingAnchor.constraint(equalTo: profileButton.trailingAnchor),
             profileUnderline.bottomAnchor.constraint(equalTo: profileButton.bottomAnchor),
         ])
     }
-
-    func setupContainerView() {
-        containerView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(containerView)
-        NSLayoutConstraint.activate([
-            containerView.topAnchor.constraint(equalTo: movieListButton.bottomAnchor),  // 버튼 아래에 위치
-            containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-    }
-
-    // 자식 뷰컨트롤러 및 서브뷰 모두 제거하는 함수
-    private func removeAllChildren() {
-        for child in children {
-            child.willMove(toParent: nil)
-            child.view.removeFromSuperview()
-            child.removeFromParent()
+    
+    private func setupListView() {
+        view.addSubview(bannerImageView)
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        
+        bannerImageView.snp.makeConstraints { make in
+            make.top.equalTo(movieListButton.snp.bottom).offset(10)
+            make.leading.trailing.equalToSuperview().inset(15)
+            make.height.equalTo(150)
         }
-        containerView.subviews.forEach { $0.removeFromSuperview() }
-    }
-
-    @objc func showSearch() {
-        updateSelectedButton(searchButton)  // 선택 상태 업데이트
-        removeAllChildren()  // 기존 뷰 제거
-        // 빈 화면 상태 유지 (검색 뷰 추가 가능)
-    }
-
-    @objc func showProfile() {
-        updateSelectedButton(profileButton)  // 선택 상태 업데이트
-        removeAllChildren()  // 기존 뷰 제거
-        // 빈 화면 상태 유지 (프로필 뷰 추가 가능)
-    }
-
-    @objc func showMovieList() {
-        updateSelectedButton(movieListButton)  // 선택 상태 업데이트
-        removeAllChildren()  // 기존 뷰 제거
-
-        // 영화목록 뷰컨트롤러 추가
-        let listVC = ListView()
-        addChild(listVC)
-        listVC.view.frame = containerView.bounds
-        containerView.addSubview(listVC.view)
-        listVC.didMove(toParent: self)
-    }
-
-    // 선택된 버튼 표시, 밑줄 표시 상태 업데이트
-    func updateSelectedButton(_ selectedButton: UIButton) {
-        [movieListButton, searchButton, profileButton].forEach {
-            $0.backgroundColor = .white  // 모두 흰색 배경
-            $0.setTitleColor(.black, for: .normal)  // 모두 검은색 텍스트
+        
+        scrollView.snp.makeConstraints { make in
+            make.top.equalTo(bannerImageView.snp.bottom).offset(10)
+            make.leading.trailing.bottom.equalToSuperview()
         }
+        
+        contentView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+            make.width.equalTo(scrollView.snp.width)
+        }
+        
+        var previousBottom = contentView.snp.top
+        
+        for title in categoryTitles {
+            let button = UIButton(type: .system)
+            button.setTitle(title, for: .normal)
+            button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+            button.layer.cornerRadius = 15
+            button.layer.borderWidth = 1
+            button.layer.borderColor = UIColor.systemGray4.cgColor
+            button.setTitleColor(.black, for: .normal)
+            button.backgroundColor = .white
+            button.addTarget(self, action: #selector(categoryButtonTapped(_:)), for: .touchUpInside)
+            
+            categoryButtons.append(button)
+            contentView.addSubview(button)
+            
+            let layout = UICollectionViewFlowLayout()
+            layout.scrollDirection = .horizontal
+            layout.minimumLineSpacing = 10
+            layout.sectionInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
+            
+            let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+            collectionView.backgroundColor = .clear
+            collectionView.showsHorizontalScrollIndicator = false
+            collectionView.dataSource = self
+            collectionView.delegate = self
+            collectionView.register(MovieCell.self, forCellWithReuseIdentifier: MovieCell.identifier)
+            
+            collectionViews.append(collectionView)
+            contentView.addSubview(collectionView)
+            
+            button.snp.makeConstraints { make in
+                make.top.equalTo(previousBottom).offset(20)
+                make.centerX.equalToSuperview()
+                make.width.equalTo(120)
+                make.height.equalTo(35)
+            }
+            
+            collectionView.snp.makeConstraints { make in
+                make.top.equalTo(button.snp.bottom).offset(10)
+                make.leading.trailing.equalToSuperview()
+                make.height.equalTo(180)
+            }
+            
+            previousBottom = collectionView.snp.bottom
+        }
+        
+        contentView.snp.makeConstraints { make in
+            make.bottom.equalTo(previousBottom).offset(20)
+        }
+    }
+    
+    @objc private func showMovieList() {
+        updateSelectedButton(movieListButton)
+        clearListView()
+        setupListView()  // ← 리스트 화면 다시 구성
+    }
+    
+    @objc private func showSearch() {
+        updateSelectedButton(searchButton)
+        clearListView()
+        // 검색 화면 추가 가능
+    }
 
+    @objc private func showProfile() {
+        updateSelectedButton(profileButton)
+        clearListView()
+        // 프로필 화면 추가 가능
+    }
+    private func clearListView() {
+        scrollView.removeFromSuperview()
+        bannerImageView.removeFromSuperview()
+        categoryButtons.removeAll()
+        collectionViews.removeAll()
+    }
+
+    private func updateSelectedButton(_ selectedButton: UIButton) {
+        [movieListButton, searchButton, profileButton].forEach { button in
+            button.setTitleColor(.black, for: .normal)
+        }
         movieListUnderline.isHidden = movieListButton != selectedButton
         searchUnderline.isHidden = searchButton != selectedButton
         profileUnderline.isHidden = profileButton != selectedButton
+    }
+    
+    @objc private func categoryButtonTapped(_ sender: UIButton) {
+        guard let index = categoryButtons.firstIndex(of: sender) else { return }
+        for (i, button) in categoryButtons.enumerated() {
+            if i == index {
+                button.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.2)
+                button.layer.borderColor = UIColor.systemBlue.cgColor
+                button.setTitleColor(.systemBlue, for: .normal)
+            } else {
+                button.backgroundColor = .white
+                button.layer.borderColor = UIColor.systemGray4.cgColor
+                button.setTitleColor(.black, for: .normal)
+            }
+        }
+    }
+}
+
+// MARK: - UICollectionView 설정
+
+extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return dummyMovieCount
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieCell.identifier, for: indexPath) as? MovieCell else {
+            return UICollectionViewCell()
+        }
+        cell.configure(index: indexPath.item)
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: 120, height: 170)
+    }
+}
+class MovieCell: UICollectionViewCell {
+    
+    static let identifier = "MovieCell"
+    
+    private let posterImageView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemPink
+        view.layer.cornerRadius = 10
+        view.clipsToBounds = true
+        return view
+    }()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        contentView.addSubview(posterImageView)
+        posterImageView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        contentView.layer.cornerRadius = 10
+        contentView.layer.borderWidth = 1
+        contentView.layer.borderColor = UIColor.systemGray4.cgColor
+        contentView.clipsToBounds = true
+    }
+    
+    func configure(index: Int) {
+        // 나중에 이미지 URL 넣는 식으로 변경 가능
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
