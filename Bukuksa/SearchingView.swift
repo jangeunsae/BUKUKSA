@@ -79,7 +79,6 @@ class SearchingView: UIView, UITableViewDelegate, UITableViewDataSource, UITextF
         return cell
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-<<<<<<< HEAD
         searchTextField.text = searchResults[indexPath.row]
         resultsTableView.isHidden = true
         searchResults = []
