@@ -36,7 +36,7 @@ class HomeViewController: UIViewController {
     // bukuksa 이미지 뷰
     let bokuksaImageView: UIImageView = {
         let iv = UIImageView()
-        iv.image = UIImage(named: "bokuksa")
+        iv.image = UIImage(named: "bukuksa")
         iv.contentMode = .scaleAspectFit
         iv.clipsToBounds = true
         return iv
@@ -146,18 +146,20 @@ class HomeViewController: UIViewController {
     @objc func showSearch() {
         updateSelectedButton(searchButton)  // 선택 상태 업데이트
         removeAllChildren()  // 기존 뷰 제거
-        // 빈 화면 상태 유지 (검색 뷰 추가 가능)
+        searchingView.showSearchTextField()
+        
     }
 
     @objc func showProfile() {
         updateSelectedButton(profileButton)  // 선택 상태 업데이트
         removeAllChildren()  // 기존 뷰 제거
-        // 빈 화면 상태 유지 (프로필 뷰 추가 가능)
+        searchingView.hideSearchTextField()// 빈 화면 상태 유지 (프로필 뷰 추가 가능)
     }
 
     @objc func showMovieList() {
         updateSelectedButton(movieListButton)  // 선택 상태 업데이트
-        removeAllChildren()  // 기존 뷰 제거
+        removeAllChildren()
+        searchingView.hideSearchTextField()// 기존 뷰 제거
 
         // 영화목록 뷰컨트롤러 추가
         let listVC = ListView()

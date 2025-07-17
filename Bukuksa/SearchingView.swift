@@ -37,6 +37,7 @@ class SearchingView: UIView, UITableViewDelegate, UITableViewDataSource, UITextF
         searchTextField.borderStyle = .line
         searchTextField.keyboardType = .default
         searchTextField.placeholder = "Search"
+        searchTextField.isHidden = true
         
         searchTextField.snp.makeConstraints { make in
             make.top.equalTo(self.safeAreaLayoutGuide).offset(10)
@@ -83,4 +84,14 @@ class SearchingView: UIView, UITableViewDelegate, UITableViewDataSource, UITextF
             resultsTableView.isHidden = searchResults.isEmpty
             resultsTableView.reloadData()
         }
+    
+    public func showSearchTextField() {
+        searchTextField.isHidden = false
+        resultsTableView.isHidden = false
+    }
+    
+    public func hideSearchTextField() {
+        searchTextField.isHidden = true
+        resultsTableView.isHidden = true
+    }
 }
