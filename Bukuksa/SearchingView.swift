@@ -40,6 +40,7 @@ class SearchingView: UIView, UITableViewDelegate, UITableViewDataSource, UITextF
         searchTextField.borderStyle = .line
         searchTextField.keyboardType = .default
         searchTextField.placeholder = "Search"
+        searchTextField.isHidden = true
         
         searchTextField.isHidden = true
         
@@ -78,6 +79,7 @@ class SearchingView: UIView, UITableViewDelegate, UITableViewDataSource, UITextF
         return cell
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+<<<<<<< HEAD
         searchTextField.text = searchResults[indexPath.row]
         resultsTableView.isHidden = true
         searchResults = []
@@ -89,7 +91,6 @@ class SearchingView: UIView, UITableViewDelegate, UITableViewDataSource, UITextF
         resultsTableView.isHidden = searchResults.isEmpty
         resultsTableView.reloadData()
     }
-    
     
     public func showSearchTextField() {
         searchTextField.isHidden = false
