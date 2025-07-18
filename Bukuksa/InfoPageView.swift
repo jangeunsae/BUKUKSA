@@ -15,6 +15,8 @@ struct MovieInfo: Decodable {
 
 class InfoPageViewController: UIViewController {
 
+    private var selectedMovieTitle: String?
+
     let titleLabel: UILabel = {
         let title = UILabel()
         title.text = ""
@@ -122,6 +124,7 @@ class InfoPageViewController: UIViewController {
 
     @objc private func buttonTapped() {
         let bookingVC = BookingViewController()
+        bookingVC.movieTitle = self.selectedMovieTitle
         self.navigationController?.pushViewController(bookingVC, animated: true)
     }
 
@@ -139,6 +142,7 @@ class InfoPageViewController: UIViewController {
                     DispatchQueue.main.async {
                         self.titleLabel.text = movie.title
                         self.navigationItem.title = movie.title
+                        self.selectedMovieTitle = movie.title
                         let rating = String(format: "%.1f", movie.vote_average)
                         let releaseDate = movie.release_date ?? "-"
                         self.ratingLabel.text = "평점: \(rating)/10"

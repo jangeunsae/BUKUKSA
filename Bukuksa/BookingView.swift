@@ -18,7 +18,8 @@ struct Movie: Codable {
 
 class BookingViewController: UIViewController {
     
-    var movie: Movie!
+    var movieTitle: String?
+    let dateRowLabel = UILabel()
     
     
     override func viewDidLoad() {
@@ -28,22 +29,27 @@ class BookingViewController: UIViewController {
 
         // Title label
         let titleLabel = UILabel()
-        titleLabel.text = "예매정보"
-        titleLabel.font = .boldSystemFont(ofSize: 26)
+        titleLabel.text = "예매하기"
+        titleLabel.font = .boldSystemFont(ofSize: 30)
 
         // 영화명 row
-        let movieRow = makeRow(title: "영화명", value: movie?.title ?? "영화명")
+        let movieTitleLabel = UILabel()
+        movieTitleLabel.text = movieTitle ?? "영화명"
+        movieTitleLabel.font = .boldSystemFont(ofSize: 20)
+        let movieRow = makeRow(title: "영화명", valueLabel: movieTitleLabel)
 
         // 날짜 row
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"
-        let now = dateFormatter.string(from: Date())
-        let dateRow = makeRow(title: "날짜", value: now)
+        dateRowLabel.font = .boldSystemFont(ofSize: 20)
+        let dateRow = makeRow(title: "날짜", valueLabel: dateRowLabel)
+        updateCurrentTime()
+        Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+            self?.updateCurrentTime()
+        }
 
         // 인원수 row (카운터)
         let countTitle = UILabel()
         countTitle.text = "인원"
-        countTitle.font = .boldSystemFont(ofSize: 18)
+        countTitle.font = .boldSystemFont(ofSize: 20)
 
         let countValueLabel = UILabel()
         countValueLabel.text = "1"
@@ -58,9 +64,18 @@ class BookingViewController: UIViewController {
         plusButton.setTitle("+", for: .normal)
         plusButton.setTitleColor(.black, for: .normal)
 
-        let counterStack = UIStackView(arrangedSubviews: [countValueLabel, minusButton, plusButton])
+        let counterStack = UIStackView(arrangedSubviews: [minusButton, countValueLabel, plusButton])
         counterStack.axis = .horizontal
         counterStack.spacing = 10
+        counterStack.alignment = .center
+
+        [minusButton, plusButton].forEach {
+            $0.backgroundColor = .systemGray5
+            $0.layer.cornerRadius = 10
+            $0.snp.makeConstraints { make in
+                make.width.height.equalTo(30)
+            }
+        }
 
         let peopleStack = UIStackView(arrangedSubviews: [countTitle, counterStack])
         peopleStack.axis = .horizontal
@@ -69,7 +84,7 @@ class BookingViewController: UIViewController {
         // 총 가격 row
         let totalTitleLabel = UILabel()
         totalTitleLabel.text = "총 가격"
-        totalTitleLabel.font = .boldSystemFont(ofSize: 18)
+        totalTitleLabel.font = .boldSystemFont(ofSize: 20)
 
         let totalPriceLabel = UILabel()
         totalPriceLabel.textAlignment = .right
@@ -96,27 +111,27 @@ class BookingViewController: UIViewController {
         view.addSubview(payButton)
 
         titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(40)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(80)
             make.leading.trailing.equalToSuperview().inset(20)
         }
 
         movieRow.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(60)
+            make.top.equalTo(titleLabel.snp.bottom).offset(80)
             make.leading.trailing.equalToSuperview().inset(20)
         }
 
         dateRow.snp.makeConstraints { make in
-            make.top.equalTo(movieRow.snp.bottom).offset(60)
+            make.top.equalTo(movieRow.snp.bottom).offset(80)
             make.leading.trailing.equalToSuperview().inset(20)
         }
 
         peopleStack.snp.makeConstraints { make in
-            make.top.equalTo(dateRow.snp.bottom).offset(60)
+            make.top.equalTo(dateRow.snp.bottom).offset(80)
             make.leading.trailing.equalToSuperview().inset(20)
         }
 
         totalStack.snp.makeConstraints { make in
-            make.top.equalTo(peopleStack.snp.bottom).offset(60)
+            make.top.equalTo(peopleStack.snp.bottom).offset(80)
             make.leading.trailing.equalToSuperview().inset(20)
         }
 
@@ -130,7 +145,7 @@ class BookingViewController: UIViewController {
         // 인원수 및 가격 로직
         var count = 1
         func updatePrice() {
-            let price = 17000
+            let price = 7000
             countValueLabel.text = "\(count)"
             totalPriceLabel.text = "\(count * price)원"
         }
@@ -162,14 +177,24 @@ class BookingViewController: UIViewController {
     @objc func saveToCoreData() {
         
     }
+    
+    private func updateCurrentTime() {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy/MM/dd HH:mm"
+        dateRowLabel.text = formatter.string(from: Date())
+    }
 
     private func makeRow(title: String, value: String) -> UIStackView {
+        let label = UILabel()
+        label.text = value
+        label.font = .boldSystemFont(ofSize: 18)
+        return makeRow(title: title, valueLabel: label)
+    }
+
+    private func makeRow(title: String, valueLabel: UILabel) -> UIStackView {
         let titleLabel = UILabel()
         titleLabel.text = title
         titleLabel.font = .boldSystemFont(ofSize: 18)
-        let valueLabel = UILabel()
-        valueLabel.text = value
-        valueLabel.font = .boldSystemFont(ofSize: 18)
         let stack = UIStackView(arrangedSubviews: [titleLabel, valueLabel])
         stack.axis = .horizontal
         stack.distribution = .equalSpacing
@@ -177,4 +202,6 @@ class BookingViewController: UIViewController {
         return stack
     }
     
+
 }
+
