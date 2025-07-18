@@ -80,7 +80,7 @@ class InfoPageViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-
+        
         [imageView, titleLabel, descriptionLabel, reservationButton, infoStackView].forEach {
             view.addSubview($0)
         }
@@ -119,7 +119,7 @@ class InfoPageViewController: UIViewController {
             make.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
         }
 
-        fetchMovieData()
+//        fetchMovieData()
     }
 
     @objc private func buttonTapped() {

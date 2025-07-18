@@ -20,8 +20,8 @@ class BookingViewController: UIViewController {
     
     var movieTitle: String?
     let dateRowLabel = UILabel()
-    
-    
+    var count = 1
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -102,7 +102,8 @@ class BookingViewController: UIViewController {
         payButton.layer.cornerRadius = 25
         payButton.titleLabel?.font = .boldSystemFont(ofSize: 18)
         payButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: 30, bottom: 10, right: 30)
-
+        
+        
         view.addSubview(titleLabel)
         view.addSubview(movieRow)
         view.addSubview(dateRow)
@@ -143,20 +144,19 @@ class BookingViewController: UIViewController {
         }
 
         // 인원수 및 가격 로직
-        var count = 1
         func updatePrice() {
             let price = 7000
             countValueLabel.text = "\(count)"
             totalPriceLabel.text = "\(count * price)원"
         }
         minusButton.addAction(UIAction { _ in
-            if count > 1 {
-                count -= 1
+            if self.count > 1 {
+                self.count -= 1
                 updatePrice()
             }
         }, for: .touchUpInside)
         plusButton.addAction(UIAction { _ in
-            count += 1
+            self.count += 1
             updatePrice()
         }, for: .touchUpInside)
         updatePrice()
@@ -166,11 +166,36 @@ class BookingViewController: UIViewController {
             let alert = UIAlertController(title: "결제 확인", message: "결제를 진행하시겠습니까?", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "취소", style: .cancel, handler: nil))
             alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { _ in
+                let defaults = UserDefaults.standard
+                defaults.set(self.movieTitle ?? "", forKey: "reservedMovieTitle")
+                defaults.set(self.dateRowLabel.text ?? "", forKey: "reservedDate")
+                defaults.set(self.count, forKey: "reservedPeopleCount")
+                defaults.set(self.count * 7000, forKey: "reservedTotalPrice")
+                
 //                let homeVC = ListViewController() <- 목록 화면 넣으면 됨.
 //                self.navigationController?.setViewControllers([homeVC], animated: true)
             }))
             self.present(alert, animated: true)
         }, for: .touchUpInside)
+        
+        
+        //잘 저장됐나 확인 프린트.
+        let defaults = UserDefaults.standard
+
+        if let movieTitle = defaults.string(forKey: "reservedMovieTitle"),
+           let date = defaults.string(forKey: "reservedDate") {
+            let peopleCount = defaults.integer(forKey: "reservedPeopleCount")
+            let totalPrice = defaults.integer(forKey: "reservedTotalPrice")
+            
+            print("✅ 예매 정보:")
+            print("🎬 영화명: \(movieTitle)")
+            print("📅 날짜: \(date)")
+            print("👥 인원 수: \(peopleCount)")
+            print("💰 총 가격: \(totalPrice)원")
+        } else {
+            print("⚠️ 저장된 예매 정보가 없습니다.")
+        }
+        
     }
     
     //코어 데이터에 저장
@@ -204,4 +229,3 @@ class BookingViewController: UIViewController {
     
 
 }
-
