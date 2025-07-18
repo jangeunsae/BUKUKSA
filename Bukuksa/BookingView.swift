@@ -20,65 +20,16 @@ class BookingViewController: UIViewController {
     
     var movie: Movie!
     
-    let titleLabel: UILabel = {
-        let title = UILabel()
-        title.text = "결제하기"
-        return title
-    }()
-    
-    let infoLabel: UILabel = {
-        let info = UILabel()
-        info.text = "예매정보"
-        return info
-    }()
-    
-    let imageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
-        imageView.backgroundColor = .gray
-        return imageView
-    }()
-    
-    let imageTitleLabel: UILabel = {
-        let title = UILabel()
-        title.text = "좀비딸"
-        return title
-    }()
-    
-    let dateLabel: UILabel = {
-        let date = UILabel()
-        date.text = "2025-07-15 14:00"
-        return date
-    }()
-    
-    let peopleCountLabel: UILabel = {
-        let peopleCount = UILabel()
-        peopleCount.text = "성인 1"
-        return peopleCount
-    }()
-    
-    let totalPriceLabel: UILabel = {
-        let totalPrice = UILabel()
-        totalPrice.text = "100,000원"
-        return totalPrice
-    }()
-    
-    let paymentButton: UIButton = {
-        let payment = UIButton()
-        payment.setTitle("결제하기", for: .normal)
-        return payment
-    }()
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        navigationItem.title = "예매하기"
+        navigationItem.title = "결제하기"
 
         // Title label
         let titleLabel = UILabel()
         titleLabel.text = "예매정보"
-        titleLabel.font = .boldSystemFont(ofSize: 24)
+        titleLabel.font = .boldSystemFont(ofSize: 26)
 
         // 영화명 row
         let movieRow = makeRow(title: "영화명", value: movie?.title ?? "영화명")
@@ -92,11 +43,13 @@ class BookingViewController: UIViewController {
         // 인원수 row (카운터)
         let countTitle = UILabel()
         countTitle.text = "인원"
+        countTitle.font = .boldSystemFont(ofSize: 18)
 
         let countValueLabel = UILabel()
         countValueLabel.text = "1"
         countValueLabel.textAlignment = .center
         countValueLabel.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        countValueLabel.font = .boldSystemFont(ofSize: 18)
 
         let minusButton = UIButton()
         minusButton.setTitle("-", for: .normal)
@@ -116,6 +69,7 @@ class BookingViewController: UIViewController {
         // 총 가격 row
         let totalTitleLabel = UILabel()
         totalTitleLabel.text = "총 가격"
+        totalTitleLabel.font = .boldSystemFont(ofSize: 18)
 
         let totalPriceLabel = UILabel()
         totalPriceLabel.textAlignment = .right
@@ -130,31 +84,53 @@ class BookingViewController: UIViewController {
         payButton.setTitle("결제하기", for: .normal)
         payButton.setTitleColor(.white, for: .normal)
         payButton.backgroundColor = .systemBlue
-        payButton.layer.cornerRadius = 8
+        payButton.layer.cornerRadius = 25
+        payButton.titleLabel?.font = .boldSystemFont(ofSize: 18)
+        payButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: 30, bottom: 10, right: 30)
 
-        // 메인 스택
-        let mainStack = UIStackView(arrangedSubviews: [titleLabel, movieRow, dateRow, peopleStack, totalStack])
-        mainStack.axis = .vertical
-        mainStack.spacing = 20
-
-        view.addSubview(mainStack)
+        view.addSubview(titleLabel)
+        view.addSubview(movieRow)
+        view.addSubview(dateRow)
+        view.addSubview(peopleStack)
+        view.addSubview(totalStack)
         view.addSubview(payButton)
 
-        mainStack.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(20)
+        titleLabel.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(40)
             make.leading.trailing.equalToSuperview().inset(20)
         }
+
+        movieRow.snp.makeConstraints { make in
+            make.top.equalTo(titleLabel.snp.bottom).offset(60)
+            make.leading.trailing.equalToSuperview().inset(20)
+        }
+
+        dateRow.snp.makeConstraints { make in
+            make.top.equalTo(movieRow.snp.bottom).offset(60)
+            make.leading.trailing.equalToSuperview().inset(20)
+        }
+
+        peopleStack.snp.makeConstraints { make in
+            make.top.equalTo(dateRow.snp.bottom).offset(60)
+            make.leading.trailing.equalToSuperview().inset(20)
+        }
+
+        totalStack.snp.makeConstraints { make in
+            make.top.equalTo(peopleStack.snp.bottom).offset(60)
+            make.leading.trailing.equalToSuperview().inset(20)
+        }
+
         payButton.snp.makeConstraints { make in
             make.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
             make.centerX.equalToSuperview()
             make.height.equalTo(50)
-            make.width.equalTo(200)
+            make.width.greaterThanOrEqualTo(200)
         }
 
         // 인원수 및 가격 로직
         var count = 1
         func updatePrice() {
-            let price = 10000
+            let price = 17000
             countValueLabel.text = "\(count)"
             totalPriceLabel.text = "\(count * price)원"
         }
@@ -169,9 +145,18 @@ class BookingViewController: UIViewController {
             updatePrice()
         }, for: .touchUpInside)
         updatePrice()
+
+        // 결제하기 버튼에 알림 및 홈 이동 로직 추가
+        payButton.addAction(UIAction { _ in
+            let alert = UIAlertController(title: "결제 확인", message: "결제를 진행하시겠습니까?", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "취소", style: .cancel, handler: nil))
+            alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { _ in
+//                let homeVC = ListViewController() <- 목록 화면 넣으면 됨.
+//                self.navigationController?.setViewControllers([homeVC], animated: true)
+            }))
+            self.present(alert, animated: true)
+        }, for: .touchUpInside)
     }
-    
-    // 결제 버튼 동작 등은 필요시 여기에 구현
     
     //코어 데이터에 저장
     @objc func saveToCoreData() {
@@ -181,10 +166,10 @@ class BookingViewController: UIViewController {
     private func makeRow(title: String, value: String) -> UIStackView {
         let titleLabel = UILabel()
         titleLabel.text = title
-        titleLabel.font = .systemFont(ofSize: 16)
+        titleLabel.font = .boldSystemFont(ofSize: 18)
         let valueLabel = UILabel()
         valueLabel.text = value
-        valueLabel.font = .systemFont(ofSize: 16)
+        valueLabel.font = .boldSystemFont(ofSize: 18)
         let stack = UIStackView(arrangedSubviews: [titleLabel, valueLabel])
         stack.axis = .horizontal
         stack.distribution = .equalSpacing
