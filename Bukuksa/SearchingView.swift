@@ -17,7 +17,7 @@ class SearchingView: UIView, UITextFieldDelegate, UICollectionViewDelegate, UICo
             layout.scrollDirection = .horizontal
             layout.itemSize = CGSize(width: 100, height: 150)
             layout.minimumLineSpacing = 10
-            
+        
             let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
             collectionView.delegate = self
             collectionView.dataSource = self
@@ -59,7 +59,7 @@ class SearchingView: UIView, UITextFieldDelegate, UICollectionViewDelegate, UICo
             make.height.equalTo(160)
         }
         fetchMoives {
-            self.searchTextField.isHidden = false
+            self.searchTextField.isHidden = true
             self.searchTextField.becomeFirstResponder()
             self.filterSearchResults(text: self.searchTextField.text ?? "")
         }
