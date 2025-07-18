@@ -9,7 +9,16 @@ import SnapKit
 import UIKit
 import Alamofire
 
+struct Movie: Codable {
+    let id: Int
+    let title: String
+    let imageUrl: String
+    let description: String
+}
+
 class BookingViewController: UIViewController {
+    
+    var movie: Movie!
     
     let titleLabel: UILabel = {
         let title = UILabel()
@@ -57,136 +66,130 @@ class BookingViewController: UIViewController {
     let paymentButton: UIButton = {
         let payment = UIButton()
         payment.setTitle("결제하기", for: .normal)
-        payment.addTarget(self, action: #selector(paymentButtonTapped), for: .touchUpInside)
         return payment
-    }()
-    
-    let likeButton: UIButton = {
-        let like = UIButton()
-        like.setTitle("like", for: .normal)
-        like.addTarget(self, action: #selector(likeButtonTapped), for: .touchUpInside)
-        return like
     }()
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .cyan
-        view.addSubview(titleLabel)
-        view.addSubview(infoLabel)
-        view.addSubview(imageView)
-        view.addSubview(imageTitleLabel)
-        view.addSubview(dateLabel)
-        view.addSubview(peopleCountLabel)
-        view.addSubview(totalPriceLabel)
-        view.addSubview(paymentButton)
-        view.addSubview(likeButton)
-        buttonActions()
-        
-        //탭 아이템 제목
-        navigationItem.title = "부국사"
-        
-        //제목
-        titleLabel.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.centerY.equalToSuperview().multipliedBy(0.25)
-        }
-        
-        //정보 라벨
-        infoLabel.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.centerY.equalTo(titleLabel.snp.bottom).offset(30)
-        }
-        
-        //이미지 뷰
-        imageView.snp.makeConstraints { make in
-            make.top.equalTo(infoLabel.snp.bottom).offset(20)
-            make.leading.equalToSuperview().offset(20)
-            make.size.equalTo(140)
-        }
-        
-        //이미지 제목 라벨
-        imageTitleLabel.snp.makeConstraints { make in
-            make.top.equalTo(imageView)
-            make.leading.equalTo(imageView.snp.trailing).offset(20)
-            make.trailing.lessThanOrEqualToSuperview().inset(20)
-        }
-        
-        //날짜 라벨
-        dateLabel.snp.makeConstraints { make in
-            make.top.equalTo(imageTitleLabel.snp.bottom).offset(10)
-            make.leading.equalTo(imageTitleLabel)
-            make.trailing.lessThanOrEqualToSuperview().inset(20)
-        }
-        
-        //인원수 라벨
-        peopleCountLabel.snp.makeConstraints { make in
-            make.top.equalTo(dateLabel.snp.bottom).offset(10)
-            make.leading.equalTo(imageTitleLabel)
-            make.trailing.lessThanOrEqualToSuperview().inset(20)
-        }
-        
-        totalPriceLabel.snp.makeConstraints { make in
-            make.top.equalTo(peopleCountLabel.snp.bottom).offset(10)
-            make.leading.equalTo(imageTitleLabel)
-            make.trailing.lessThanOrEqualToSuperview().inset(20)
-        }
-        
-        paymentButton.snp.makeConstraints { make in
-            make.bottom.equalToSuperview().inset(20)
-            make.centerX.equalToSuperview()
-        }
-        
-        likeButton.snp.makeConstraints { make in
-            make.bottom.equalToSuperview().inset(20)
-            make.leading.equalTo(paymentButton.snp.trailing).offset(20)
-        }
-        
-    }
-    
-    @objc private func paymentButtonTapped() {
-//        self.navigationController?.pushViewController(ListViewController(), animated: true)
-        let sheet = UIAlertController(title: "카메라", message: "카메라를 키겠습니까?", preferredStyle: .actionSheet)
+        view.backgroundColor = .white
+        navigationItem.title = "예매하기"
 
-        sheet.addAction(UIAlertAction(title: "Yes!", style: .destructive, handler: { _ in print("yes 클릭") }))
+        // Title label
+        let titleLabel = UILabel()
+        titleLabel.text = "예매정보"
+        titleLabel.font = .boldSystemFont(ofSize: 24)
 
-        sheet.addAction(UIAlertAction(title: "No!", style: .cancel, handler: { _ in print("yes 클릭") }))
+        // 영화명 row
+        let movieRow = makeRow(title: "영화명", value: movie?.title ?? "영화명")
 
-        present(sheet, animated: true)
-    }
-    
-    private func buttonActions() {
-            likeButton.addTarget(self, action: #selector(likeButtonTapped(_:)), for: .touchUpInside)
+        // 날짜 row
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"
+        let now = dateFormatter.string(from: Date())
+        let dateRow = makeRow(title: "날짜", value: now)
+
+        // 인원수 row (카운터)
+        let countTitle = UILabel()
+        countTitle.text = "인원"
+
+        let countValueLabel = UILabel()
+        countValueLabel.text = "1"
+        countValueLabel.textAlignment = .center
+        countValueLabel.widthAnchor.constraint(equalToConstant: 30).isActive = true
+
+        let minusButton = UIButton()
+        minusButton.setTitle("-", for: .normal)
+        minusButton.setTitleColor(.black, for: .normal)
+        let plusButton = UIButton()
+        plusButton.setTitle("+", for: .normal)
+        plusButton.setTitleColor(.black, for: .normal)
+
+        let counterStack = UIStackView(arrangedSubviews: [countValueLabel, minusButton, plusButton])
+        counterStack.axis = .horizontal
+        counterStack.spacing = 10
+
+        let peopleStack = UIStackView(arrangedSubviews: [countTitle, counterStack])
+        peopleStack.axis = .horizontal
+        peopleStack.distribution = .equalSpacing
+
+        // 총 가격 row
+        let totalTitleLabel = UILabel()
+        totalTitleLabel.text = "총 가격"
+
+        let totalPriceLabel = UILabel()
+        totalPriceLabel.textAlignment = .right
+        totalPriceLabel.font = .boldSystemFont(ofSize: 18)
+
+        let totalStack = UIStackView(arrangedSubviews: [totalTitleLabel, totalPriceLabel])
+        totalStack.axis = .horizontal
+        totalStack.distribution = .equalSpacing
+
+        // 결제 버튼
+        let payButton = UIButton()
+        payButton.setTitle("결제하기", for: .normal)
+        payButton.setTitleColor(.white, for: .normal)
+        payButton.backgroundColor = .systemBlue
+        payButton.layer.cornerRadius = 8
+
+        // 메인 스택
+        let mainStack = UIStackView(arrangedSubviews: [titleLabel, movieRow, dateRow, peopleStack, totalStack])
+        mainStack.axis = .vertical
+        mainStack.spacing = 20
+
+        view.addSubview(mainStack)
+        view.addSubview(payButton)
+
+        mainStack.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(20)
+            make.leading.trailing.equalToSuperview().inset(20)
         }
-    
-    
-    // 버튼 클릭 애니메이션
-        private func animateButtonPress(_ button: UIButton) {
-            UIView.animate(withDuration: 0.1,
-                           animations: {
-                // 눌렸을 때 크기가 작아짐
-                button.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-            },
-                           completion: { _ in
-                // 애니메이션 완료 후 원래 크기로 돌아옴
-                UIView.animate(withDuration: 0.1) {
-                    button.transform = CGAffineTransform.identity
-                }
-            })
+        payButton.snp.makeConstraints { make in
+            make.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
+            make.centerX.equalToSuperview()
+            make.height.equalTo(50)
+            make.width.equalTo(200)
         }
-    
-    
-    @objc private func likeButtonTapped(_ sender: UIButton) {
-            animateButtonPress(sender)
-            
-            // 버튼 색상 변경
-            if sender.titleColor(for: .normal) == .lightGray {
-                sender.setTitleColor(.systemRed, for: .normal)
-                sender.layer.borderColor = UIColor.red.cgColor
-            } else {
-                sender.setTitleColor(.lightGray, for: .normal)
-                sender.layer.borderColor = UIColor.lightGray.cgColor
+
+        // 인원수 및 가격 로직
+        var count = 1
+        func updatePrice() {
+            let price = 10000
+            countValueLabel.text = "\(count)"
+            totalPriceLabel.text = "\(count * price)원"
+        }
+        minusButton.addAction(UIAction { _ in
+            if count > 1 {
+                count -= 1
+                updatePrice()
             }
-        }
+        }, for: .touchUpInside)
+        plusButton.addAction(UIAction { _ in
+            count += 1
+            updatePrice()
+        }, for: .touchUpInside)
+        updatePrice()
+    }
+    
+    // 결제 버튼 동작 등은 필요시 여기에 구현
+    
+    //코어 데이터에 저장
+    @objc func saveToCoreData() {
+        
+    }
+
+    private func makeRow(title: String, value: String) -> UIStackView {
+        let titleLabel = UILabel()
+        titleLabel.text = title
+        titleLabel.font = .systemFont(ofSize: 16)
+        let valueLabel = UILabel()
+        valueLabel.text = value
+        valueLabel.font = .systemFont(ofSize: 16)
+        let stack = UIStackView(arrangedSubviews: [titleLabel, valueLabel])
+        stack.axis = .horizontal
+        stack.distribution = .equalSpacing
+        stack.spacing = 8
+        return stack
+    }
     
 }
