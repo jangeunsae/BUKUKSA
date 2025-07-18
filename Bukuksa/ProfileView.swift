@@ -80,10 +80,7 @@ class ProfileView: UIView, UITableViewDelegate, UITableViewDataSource {
         reservecontainer.addSubview(reservationLabel)
         
         reservationLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(12)
-            make.trailing.equalToSuperview().offset(-12)
-            make.centerY.equalToSuperview()
-            make.centerX.equalToSuperview()
+            make.center.equalToSuperview()
         }
         reservationLabel.textColor = .white
         reservationLabel.font = .systemFont(ofSize: 20, weight: .bold)
@@ -115,10 +112,7 @@ class ProfileView: UIView, UITableViewDelegate, UITableViewDataSource {
         
         qrcontainer.addSubview(qrCodeLabel)
         qrCodeLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(12)
-            make.trailing.equalToSuperview().offset(-12)
-            make.centerY.equalToSuperview()
-            make.centerX.equalToSuperview()
+            make.center.equalToSuperview()
             
         }
         qrCodeLabel.textColor = .white
@@ -126,7 +120,12 @@ class ProfileView: UIView, UITableViewDelegate, UITableViewDataSource {
         qrCodeLabel.text = "QR CODE"
         
         addSubview(qrCodeImageView)
+        qrCodeImageView.contentMode = .scaleAspectFit
+        qrCodeImageView.image = UIImage(named: "QRCode")
         qrCodeImageView.snp.makeConstraints { make in
+            make.top.equalTo(qrcontainer.snp.bottom).offset(10)
+            make.width.equalTo(280)
+            make.height.equalTo(280)
             
         }
     }
