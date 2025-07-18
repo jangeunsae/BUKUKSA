@@ -2,6 +2,7 @@
 //  RegisterView.swift
 //  Bukuksa
 //
+
 //  Created by 송명균 on 7/16/25.
 //
 
@@ -149,3 +150,4 @@ class RegisterView: UIView {
         return nil
     }
 }
+
