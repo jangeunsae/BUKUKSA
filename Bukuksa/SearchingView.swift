@@ -5,21 +5,29 @@
 //  Created by 장은새 on 7/15/25.
 //
 
-
 import Foundation
-
 import UIKit
 import SnapKit
 
-class SearchingView: UIView, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
+class SearchingView: UIView, UITextFieldDelegate, UICollectionViewDelegate, UICollectionViewDataSource {
     
     private let searchTextField = UITextField()
-    private let resultsTableView = UITableView()
-    private let collectionViewCell = UICollectionViewCell()
-    private var searchResults: [String] = []
-    private let allSearchLists = ["a", "b", "c", "d"]
-    //collectionViewcell이 만들어져서 밑에 연관검색어와 연결되는 영화목록이 떠야함
-    
+    private lazy var collectionView: UICollectionView = {
+            let layout = UICollectionViewFlowLayout()
+            layout.scrollDirection = .horizontal
+            layout.itemSize = CGSize(width: 100, height: 150)
+            layout.minimumLineSpacing = 10
+            
+            let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+            collectionView.delegate = self
+            collectionView.dataSource = self
+            collectionView.isHidden = true
+            collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+            return collectionView
+        }()
+    private var movies: [Movie] = []
+    private var filteredMovies: [Movie] = []
+    //API를 구현해서 텍스트필드에 입력된 값의 영화제목의 이미지를 가져와야함
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
@@ -32,72 +40,140 @@ class SearchingView: UIView, UITableViewDelegate, UITableViewDataSource, UITextF
     
     private func setupView() {
         addSubview(searchTextField)
-        addSubview(resultsTableView)
+        addSubview(collectionView)
         
-        searchTextField.backgroundColor = .lightGray
         searchTextField.delegate = self
         searchTextField.becomeFirstResponder()
-        searchTextField.borderStyle = .line
-        searchTextField.keyboardType = .default
+        searchTextField.borderStyle = .roundedRect
         searchTextField.placeholder = "Search"
         searchTextField.isHidden = true
-        
-        searchTextField.isHidden = true
-        
-        
         searchTextField.snp.makeConstraints { make in
-            make.top.equalTo(self.safeAreaLayoutGuide).offset(10)
+            make.top.equalTo(self.safeAreaLayoutGuide).offset(60)
             make.horizontalEdges.equalToSuperview().inset(20)
             make.height.equalTo(50)
         }
         
-        resultsTableView.delegate = self
-        resultsTableView.dataSource = self
-        resultsTableView.isHidden = true
-        
-        resultsTableView.register(UITableViewCell.self, forCellReuseIdentifier: "SearchCell")
-        
-        resultsTableView.snp.makeConstraints { make in
+        collectionView.snp.makeConstraints { make in
             make.top.equalTo(searchTextField.snp.bottom).offset(10)
-            make.horizontalEdges.equalToSuperview().inset(20)
-            make.bottom.equalToSuperview()
+            make.leading.trailing.equalToSuperview().inset(20)
+            make.height.equalTo(160)
         }
+        fetchMoives {
+            self.searchTextField.isHidden = false
+            self.searchTextField.becomeFirstResponder()
+            self.filterSearchResults(text: self.searchTextField.text ?? "")
+        }
+        
     }
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let updatedText = (textField.text as NSString?)?.replacingCharacters(in: range, with: string) ?? string
-        filterSearchResults(text: updatedText)
+        filterSearchResults(text: textField.text ?? "")
         return true
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return searchResults.count
+    
+    
+    private func filterSearchResults(text: String) {
+        filteredMovies = movies.filter { movie in movie.title.lowercased().contains(text.lowercased()) }
+        collectionView.reloadData()
+        collectionView.isHidden = filteredMovies.isEmpty
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "SearchCell", for: indexPath)
-        cell.textLabel?.text = searchResults[indexPath.row]
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return filteredMovies.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
+        cell.contentView.subviews.forEach { subview in subview.removeFromSuperview() }
+
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+
+        let titleLabel = UILabel()
+        titleLabel.textAlignment = .center
+        titleLabel.font = UIFont.systemFont(ofSize: 12)
+        titleLabel.numberOfLines = 2
+
+        cell.contentView.addSubview(imageView)
+        cell.contentView.addSubview(titleLabel)
+
+        imageView.snp.makeConstraints { make in
+            make.top.leading.trailing.equalToSuperview()
+            make.height.equalTo(120)
+        }
+
+        titleLabel.snp.makeConstraints { make in
+            make.top.equalTo(imageView.snp.bottom).offset(4)
+            make.leading.trailing.bottom.equalToSuperview()
+        }
+
+        let movie = filteredMovies[indexPath.item]
+        titleLabel.text = movie.title
+
+        if let posterPath = movie.poster_path {
+            let urlString = "https://image.tmdb.org/t/p/w500\(posterPath)"
+            if let url = URL(string: urlString) {
+                URLSession.shared.dataTask(with: url) { data, _, error in
+                    guard let data = data, error == nil else { return }
+                    DispatchQueue.main.async {
+                        imageView.image = UIImage(data: data)
+                    }
+                }.resume()
+            }
+        } else {
+            imageView.image = nil
+        }
+
         return cell
     }
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        searchTextField.text = searchResults[indexPath.row]
-        resultsTableView.isHidden = true
-        searchResults = []
-        resultsTableView.reloadData()
-    }
     
-    func filterSearchResults(text: String) {
-        searchResults = allSearchLists.filter { $0.lowercased().hasPrefix(text.lowercased()) }
-        resultsTableView.isHidden = searchResults.isEmpty
-        resultsTableView.reloadData()
+    struct Movie: Codable {
+        let title: String
+        let poster_path: String?
+    }
+
+    struct MovieResponse: Codable {
+        let results: [Movie]
+    }
+
+    func fetchMoives(completion: (() -> Void)? = nil) {
+        let apiKey = "bbbd0e19cbdae7622268c7375e59a38e"
+        let urlString = "https://api.themoviedb.org/3/movie/upcoming?api_key=\(apiKey)&language=ko-KR&page=1"
+
+        guard let url = URL(string: urlString) else { return }
+
+        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+            guard let data = data, error == nil else { return }
+
+            do {
+                let decoded = try JSONDecoder().decode(MovieResponse.self, from: data)
+                DispatchQueue.main.async {
+                    self?.movies = decoded.results
+                    completion?()
+                }
+            } catch {
+                print("Failed to decode: \(error)")
+            }
+        }.resume()
     }
     
     public func showSearchTextField() {
         searchTextField.isHidden = false
-        resultsTableView.isHidden = false
+        if !filteredMovies.isEmpty {
+            collectionView.isHidden = false
+        }
     }
-    
     public func hideSearchTextField() {
         searchTextField.isHidden = true
-        resultsTableView.isHidden = true
+    }
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        searchTextField.resignFirstResponder()
+        filterSearchResults(text: textField.text ?? "")
+        return true
+    }
+    public func hideSearchResults() {
+        collectionView.isHidden = true
     }
 }
