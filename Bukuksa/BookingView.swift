@@ -167,11 +167,28 @@ class BookingViewController: UIViewController {
             alert.addAction(UIAlertAction(title: "취소", style: .cancel, handler: nil))
             alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { _ in
                 let defaults = UserDefaults.standard
-                defaults.set(self.movieTitle ?? "", forKey: "reservedMovieTitle")
-                defaults.set(self.dateRowLabel.text ?? "", forKey: "reservedDate")
-                defaults.set(self.count, forKey: "reservedPeopleCount")
-                defaults.set(self.count * 7000, forKey: "reservedTotalPrice")
+                var reservations = defaults.array(forKey: "reservations") as? [[String: Any]] ?? []
+
+                let newReservation: [String: Any] = [
+                    "movieTitle": self.movieTitle ?? "",
+                    "date": self.dateRowLabel.text ?? "",
+                    "peopleCount": self.count,
+                    "totalPrice": self.count * 7000
+                ]
+                reservations.append(newReservation)
+                defaults.set(reservations, forKey: "reservations")
                 
+                // Debug print all reservations
+                print("✅ 전체 예매 정보 목록:")
+                for (index, reservation) in reservations.enumerated() {
+                    if let title = reservation["movieTitle"] as? String,
+                       let date = reservation["date"] as? String,
+                       let count = reservation["peopleCount"] as? Int,
+                       let price = reservation["totalPrice"] as? Int {
+                        print("📦 [\(index + 1)] 🎬 \(title), 📅 \(date), 👥 \(count)명, 💰 \(price)원")
+                    }
+                }
+
 //                let homeVC = ListViewController() <- 목록 화면 넣으면 됨.
 //                self.navigationController?.setViewControllers([homeVC], animated: true)
             }))
@@ -182,26 +199,22 @@ class BookingViewController: UIViewController {
         //잘 저장됐나 확인 프린트.
         let defaults = UserDefaults.standard
 
-        if let movieTitle = defaults.string(forKey: "reservedMovieTitle"),
-           let date = defaults.string(forKey: "reservedDate") {
-            let peopleCount = defaults.integer(forKey: "reservedPeopleCount")
-            let totalPrice = defaults.integer(forKey: "reservedTotalPrice")
-            
-            print("✅ 예매 정보:")
-            print("🎬 영화명: \(movieTitle)")
-            print("📅 날짜: \(date)")
-            print("👥 인원 수: \(peopleCount)")
-            print("💰 총 가격: \(totalPrice)원")
+        if let reservations = defaults.array(forKey: "reservations") as? [[String: Any]] {
+            print("✅ 전체 예매 정보 목록:")
+            for (index, reservation) in reservations.enumerated() {
+                if let title = reservation["movieTitle"] as? String,
+                   let date = reservation["date"] as? String,
+                   let count = reservation["peopleCount"] as? Int,
+                   let price = reservation["totalPrice"] as? Int {
+                    print("📦 [\(index + 1)] 🎬 \(title), 📅 \(date), 👥 \(count)명, 💰 \(price)원")
+                }
+            }
         } else {
             print("⚠️ 저장된 예매 정보가 없습니다.")
         }
         
     }
-    
-    //코어 데이터에 저장
-    @objc func saveToCoreData() {
-        
-    }
+
     
     private func updateCurrentTime() {
         let formatter = DateFormatter()
