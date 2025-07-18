@@ -107,7 +107,9 @@ class MainViewController: UIViewController {
         let savedPW = UserDefaults.standard.string(forKey: "userPassword")
 
         if id == savedID && pw == savedPW {
-            present(HomeViewController(), animated: true)
+            let homevc = HomeViewController()
+            homevc.modalPresentationStyle = .fullScreen
+            present(homevc, animated: true)
         } else {
             showAlert(title: "실패", message: "아이디 또는 비밀번호가 틀렸습니다.")
         }
