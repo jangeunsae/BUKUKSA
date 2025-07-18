@@ -168,6 +168,7 @@ class HomeViewController: UIViewController {
     bannerImageView.removeFromSuperview()
     categoryButtons.removeAll()
     collectionViews.removeAll()
+    contentView.subviews.forEach { $0.removeFromSuperview() }
   }
   func updateSelectedButton(_ selected: UIButton) {
     let buttons = [movieListButton, searchButton, profileButton]
