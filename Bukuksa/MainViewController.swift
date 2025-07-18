@@ -107,7 +107,7 @@ class MainViewController: UIViewController {
         let savedPW = UserDefaults.standard.string(forKey: "userPassword")
 
         if id == savedID && pw == savedPW {
-            showAlert(title: "성공", message: "로그인 성공!")
+            present(HomeViewController(), animated: true)
         } else {
             showAlert(title: "실패", message: "아이디 또는 비밀번호가 틀렸습니다.")
         }
