@@ -17,8 +17,6 @@ class InfoPageViewController: UIViewController {
 
     var movieData: MovieData?
 
-    private var selectedMovieTitle: String?
-
     let titleLabel: UILabel = {
         let title = UILabel()
         title.text = ""
@@ -93,7 +91,7 @@ class InfoPageViewController: UIViewController {
             self.imageView.image = UIImage(data: data)
             self.titleLabel.text = movie.title
             self.descriptionLabel.text = movie.overview
-            self.ratingLabel.text = "\(rating)점"
+            self.ratingLabel.text = "\(rating) / 10.0점"
             self.releaseLabel.text = "개봉일 : \(movie.release_date ?? "미정")"
         }
         
@@ -138,47 +136,8 @@ class InfoPageViewController: UIViewController {
 
     @objc private func buttonTapped() {
         let bookingVC = BookingViewController()
-        bookingVC.movieTitle = self.selectedMovieTitle
+        bookingVC.movieData = movieData
         self.navigationController?.pushViewController(bookingVC, animated: true)
     }
 
-    private func fetchMovieData() {
-        let apiKey = "bbbd0e19cbdae7622268c7375e59a38e"
-        let urlString = "https://api.themoviedb.org/3/movie/upcoming?api_key=\(apiKey)&language=ko-KR"
-
-        guard let url = URL(string: urlString) else { return }
-
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            guard let data = data, error == nil else { return }
-            do {
-                let result = try JSONDecoder().decode(MovieResponse.self, from: data)
-                if let movie = result.results.first {
-                    DispatchQueue.main.async {
-                        self.titleLabel.text = movie.title
-                        self.navigationItem.title = movie.title
-                        self.selectedMovieTitle = movie.title
-                        let rating = String(format: "%.1f", movie.vote_average)
-                        let releaseDate = movie.release_date ?? "-"
-                        self.ratingLabel.text = "평점: \(rating)/10"
-                        self.releaseLabel.text = "출시일: \(releaseDate)"
-                        self.descriptionLabel.text = movie.overview
-
-                        if let posterPath = movie.poster_path {
-                            let imageUrl = URL(string: "https://image.tmdb.org/t/p/w500\(posterPath)")
-                            if let imageUrl = imageUrl {
-                                URLSession.shared.dataTask(with: imageUrl) { data, _, _ in
-                                    guard let data = data, let image = UIImage(data: data) else { return }
-                                    DispatchQueue.main.async {
-                                        self.imageView.image = image
-                                    }
-                                }.resume()
-                            }
-                        }
-                    }
-                }
-            } catch {
-                print("Decoding error:", error)
-            }
-        }.resume()
-    }
 }

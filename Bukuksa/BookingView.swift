@@ -18,6 +18,8 @@ struct Movie: Codable {
 
 class BookingViewController: UIViewController {
     
+    var movieData: MovieData?
+    
     var movieTitle: String?
     let dateRowLabel = UILabel()
     var count = 1
@@ -29,12 +31,13 @@ class BookingViewController: UIViewController {
 
         // Title label
         let titleLabel = UILabel()
+        
         titleLabel.text = "예매하기"
         titleLabel.font = .boldSystemFont(ofSize: 30)
 
         // 영화명 row
         let movieTitleLabel = UILabel()
-        movieTitleLabel.text = movieTitle ?? "영화명"
+        movieTitleLabel.text = movieData?.title ?? "--"
         movieTitleLabel.font = .boldSystemFont(ofSize: 20)
         let movieRow = makeRow(title: "영화명", valueLabel: movieTitleLabel)
 
@@ -169,7 +172,7 @@ class BookingViewController: UIViewController {
                 var reservations = defaults.array(forKey: "reservations") as? [[String: Any]] ?? []
 
                 let newReservation: [String: Any] = [
-                    "movieTitle": self.movieTitle ?? "",
+                    "movieTitle": self.movieData?.title ?? "",
                     "date": self.dateRowLabel.text ?? "",
                     "peopleCount": self.count,
                     "totalPrice": self.count * 7000
