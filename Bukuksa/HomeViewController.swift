@@ -213,7 +213,12 @@ struct MovieDataResponse: Codable {
 }
 struct MovieData: Codable {
     let poster_path: String?
+    let title: String?
+    let overview: String?
+    let vote_average: Double?
+    let release_date: String?
 }
+
 enum Endpoint: String, CaseIterable {
     case nowPlaying = "now_playing"
     case popular = "popular"
@@ -247,6 +252,7 @@ func fetchMovieData(from endpoint: Endpoint, completion: @escaping ([MovieData]?
         }
         do {
             let decodedResponse = try JSONDecoder().decode(MovieDataResponse.self, from: data)
+            print(decodedResponse)
             completion(decodedResponse.results)
         } catch {
             print(":x: Decoding error for \(endpoint.rawValue): \(error)")

@@ -86,12 +86,15 @@ class InfoPageViewController: UIViewController {
         if let movie = movieData,
            let path = movie.poster_path,
            let url = URL(string: "https://image.tmdb.org/t/p/w500\(path)"),
-           let data = try? Data(contentsOf: url) {
+           let data = try? Data(contentsOf: url),
+           let rating = movie.vote_average
+           
+        {
             self.imageView.image = UIImage(data: data)
-            self.titleLabel.text = "선택한 영화"
-            self.descriptionLabel.text = "해당 영화의 설명이 여기에 들어갑니다."
-            self.ratingLabel.text = "평점: -"
-            self.releaseLabel.text = "출시일: -"
+            self.titleLabel.text = movie.title
+            self.descriptionLabel.text = movie.overview
+            self.ratingLabel.text = "\(rating)점"
+            self.releaseLabel.text = "개봉일 : \(movie.release_date ?? "미정")"
         }
         
         [imageView, titleLabel, descriptionLabel, reservationButton, infoStackView].forEach {
