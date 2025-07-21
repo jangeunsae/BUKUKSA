@@ -101,7 +101,6 @@ class BookingViewController: UIViewController {
         payButton.backgroundColor = .systemBlue
         payButton.layer.cornerRadius = 25
         payButton.titleLabel?.font = .boldSystemFont(ofSize: 18)
-        payButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: 30, bottom: 10, right: 30)
         
         
         view.addSubview(titleLabel)
