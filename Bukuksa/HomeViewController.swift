@@ -176,6 +176,7 @@ class HomeViewController: UIViewController {
         searchingView.showSearchTextField()
     }
     @objc func showProfile() {
+        profileView.setupView()
         updateSelectedButton(profileButton)
         clearMovieListView()
         searchingView.endEditing(true)
@@ -253,16 +254,13 @@ func fetchMovieData(from endpoint: Endpoint, completion: @escaping ([MovieData]?
     }
     URLSession.shared.dataTask(with: url) { data, response, error in
         guard let data = data, error == nil else {
-            print(":x: Error fetching \(endpoint.rawValue): \(error?.localizedDescription ?? "Unknown error")")
             completion(nil)
             return
         }
         do {
             let decodedResponse = try JSONDecoder().decode(MovieDataResponse.self, from: data)
-            print(decodedResponse)
             completion(decodedResponse.results)
         } catch {
-            print(":x: Decoding error for \(endpoint.rawValue): \(error)")
             completion(nil)
         }
     }.resume()
@@ -310,6 +308,12 @@ class MovieCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        imageView.image = nil
+    }
+    
     func configure(with movie: MovieData) {
         if let path = movie.poster_path {
             let imageURL = URL(string: "https://image.tmdb.org/t/p/w500\(path)")
@@ -323,5 +327,5 @@ extension Array {
     subscript(safe index: Int) -> Element? {
         return indices.contains(index) ? self[index] : nil
     }
-
+    
 }

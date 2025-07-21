@@ -108,7 +108,7 @@ class MainViewController: UIViewController {
         let savedPW = UserDefaults.standard.string(forKey: "userPassword")
 
         if id == savedID && pw == savedPW {
-            let homevc = HomeViewController()
+            let homevc = UINavigationController(rootViewController: HomeViewController())
             homevc.modalPresentationStyle = .fullScreen
             present(homevc, animated: true)
         } else {

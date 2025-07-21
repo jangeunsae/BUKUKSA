@@ -12,10 +12,6 @@ import SnapKit
 
 class ProfileView: UIView, UITableViewDelegate, UITableViewDataSource {
     
-    override var intrinsicContentSize: CGSize {
-      UIScreen.main.bounds.size
-    }//Preview 삭제시 같이 삭제해줘야함.
-    
     private let profileImageView = UIImageView()
     private let nameLabel = UILabel()
     private let greetingLabel = UILabel()
@@ -26,6 +22,8 @@ class ProfileView: UIView, UITableViewDelegate, UITableViewDataSource {
     private let qrcontainer = UIView()
     private let profileTableView = UITableView()
     
+    var userdataArray: [[String: Any]] = []
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .white
@@ -34,11 +32,13 @@ class ProfileView: UIView, UITableViewDelegate, UITableViewDataSource {
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        setupView()
     }
     
-    private func setupView() {
-
+    func setupView() {
+        
+        let reservations = UserDefaults.standard.array(forKey: "reservations") as? [[String: Any]] ?? []
+        userdataArray = reservations
+        
         addSubview(profileTableView)
         
         profileTableView.register(ReservationCell.self, forCellReuseIdentifier: "ReservationCell")
@@ -138,18 +138,27 @@ class ProfileView: UIView, UITableViewDelegate, UITableViewDataSource {
         profileTableView.tableFooterView = footerView
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5
+        return userdataArray.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "ReservationCell", for: indexPath) as? ReservationCell else {
             return UITableViewCell()
         }
+        let reservation = userdataArray[indexPath.row]
+        if let title = reservation["movieTitle"] as? String,
+           let date = reservation["date"] as? String,
+           let count = reservation["peopleCount"] as? Int,
+           let price = reservation["totalPrice"] as? Int {
+            cell.movieTitleLabel.text = title
+            cell.dateLabel.text = date
+            cell.peopleCountLabel.text = "\(count)"
+            cell.totalPriceLabel.text = "\(price)"
+        }
         return cell
     }
     //    영화이미지, 영화명, 날짜, 인원수, 총 가격
     class ReservationCell: UITableViewCell {
-        let movieImageView = UIImageView()
         let movieTitleLabel = UILabel()
         let dateLabel = UILabel()
         let peopleCountLabel = UILabel()
@@ -157,14 +166,39 @@ class ProfileView: UIView, UITableViewDelegate, UITableViewDataSource {
         
         override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
             super.init(style: style, reuseIdentifier: reuseIdentifier)
+            configureView()
         }
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
+        func configureView() {
+            [movieTitleLabel, dateLabel, peopleCountLabel, totalPriceLabel].forEach {
+                contentView.addSubview($0)
+                $0.font = .systemFont(ofSize: 16)
+                $0.textColor = .black
+                $0.numberOfLines = 1
+            }
+            
+            movieTitleLabel.snp.makeConstraints { make in
+                make.top.equalToSuperview().inset(12)
+                make.leading.trailing.equalToSuperview().inset(16)
+            }
+            
+            dateLabel.snp.makeConstraints { make in
+                make.top.equalTo(movieTitleLabel.snp.bottom).offset(8)
+                make.leading.trailing.equalToSuperview().inset(16)
+            }
+            
+            peopleCountLabel.snp.makeConstraints { make in
+                make.top.equalTo(dateLabel.snp.bottom).offset(8)
+                make.leading.trailing.equalToSuperview().inset(16)
+            }
+            
+            totalPriceLabel.snp.makeConstraints { make in
+                make.top.equalTo(peopleCountLabel.snp.bottom).offset(8)
+                make.leading.trailing.equalToSuperview().inset(16)
+                make.bottom.equalToSuperview().inset(12)
+            }
+        }
     }
-}
-
-@available(iOS 17.0, *)
-#Preview {
-    ProfileView()/* <-보고싶은 뷰컨트롤러나 뷰 넣으면됨*/
 }
