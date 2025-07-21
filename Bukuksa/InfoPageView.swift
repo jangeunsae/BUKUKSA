@@ -91,7 +91,7 @@ class InfoPageViewController: UIViewController {
             self.imageView.image = UIImage(data: data)
             self.titleLabel.text = movie.title
             self.descriptionLabel.text = movie.overview
-            self.ratingLabel.text = "\(rating) / 10.0점"
+            self.ratingLabel.text = String(format: "%.1f / 10.0점", rating)
             self.releaseLabel.text = "개봉일 : \(movie.release_date ?? "미정")"
         }
         
