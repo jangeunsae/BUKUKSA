@@ -45,7 +45,7 @@ class RegisterView: UIView {
 
         titleLabel.text = "BUKUKSA"
         titleLabel.font = UIFont.boldSystemFont(ofSize: 20)
-        titleLabel.textColor = UIColor.systemBlue
+        titleLabel.textColor = UIColor.systemGray
         addSubview(titleLabel)
         titleLabel.snp.makeConstraints { make in
             make.leading.equalTo(logoImageView.snp.trailing).offset(8)

@@ -66,7 +66,7 @@ class SearchingView: UIView, UITextFieldDelegate, UICollectionViewDelegate, UICo
         
     }
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        let updatedText = (textField.text as NSString?)?.replacingCharacters(in: range, with: string) ?? string
+        _ = (textField.text as NSString?)?.replacingCharacters(in: range, with: string) ?? string
         filterSearchResults(text: textField.text ?? "")
         return true
     }
