@@ -28,7 +28,7 @@ BUKUKSA/
 ├── BookingView.swift            // 영화 예매 인원 선택 및 가격 계산
 ├── LaunchScreen.storyboard     // 앱 실행 시 표시되는 시작화면
 ├── Assets.xcassets              // QR 이미지, 영화 포스터 등
-
+```
 
 사용 기술 및 라이브러리
 	•	Swift 5, UIKit, SnapKit
