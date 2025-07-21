@@ -11,20 +11,27 @@ import SnapKit
 
 class SearchingView: UIView, UITextFieldDelegate, UICollectionViewDelegate, UICollectionViewDataSource {
     
+    enum MovieCategory: String, CaseIterable {
+        case nowPlaying = "now_playing"
+        case popular = "popular"
+        case topRated = "top_rated"
+        case upcoming = "upcoming"
+    }
+    
     private let searchTextField = UITextField()
     private lazy var collectionView: UICollectionView = {
-            let layout = UICollectionViewFlowLayout()
-            layout.scrollDirection = .horizontal
-            layout.itemSize = CGSize(width: 100, height: 150)
-            layout.minimumLineSpacing = 10
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.itemSize = CGSize(width: 100, height: 150)
+        layout.minimumLineSpacing = 10
         
-            let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-            collectionView.delegate = self
-            collectionView.dataSource = self
-            collectionView.isHidden = true
-            collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
-            return collectionView
-        }()
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.isHidden = true
+        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        return collectionView
+    }()
     private var movies: [Movie] = []
     private var filteredMovies: [Movie] = []
     //API를 구현해서 텍스트필드에 입력된 값의 영화제목의 이미지를 가져와야함
@@ -86,32 +93,32 @@ class SearchingView: UIView, UITextFieldDelegate, UICollectionViewDelegate, UICo
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
         cell.contentView.subviews.forEach { subview in subview.removeFromSuperview() }
-
+        
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-
+        
         let titleLabel = UILabel()
         titleLabel.textAlignment = .center
         titleLabel.font = UIFont.systemFont(ofSize: 12)
         titleLabel.numberOfLines = 2
-
+        
         cell.contentView.addSubview(imageView)
         cell.contentView.addSubview(titleLabel)
-
+        
         imageView.snp.makeConstraints { make in
             make.top.leading.trailing.equalToSuperview()
             make.height.equalTo(120)
         }
-
+        
         titleLabel.snp.makeConstraints { make in
             make.top.equalTo(imageView.snp.bottom).offset(4)
             make.leading.trailing.bottom.equalToSuperview()
         }
-
+        
         let movie = filteredMovies[indexPath.item]
         titleLabel.text = movie.title
-
+        
         if let posterPath = movie.poster_path {
             let urlString = "https://image.tmdb.org/t/p/w500\(posterPath)"
             if let url = URL(string: urlString) {
@@ -125,7 +132,7 @@ class SearchingView: UIView, UITextFieldDelegate, UICollectionViewDelegate, UICo
         } else {
             imageView.image = nil
         }
-
+        
         return cell
     }
     
@@ -133,30 +140,38 @@ class SearchingView: UIView, UITextFieldDelegate, UICollectionViewDelegate, UICo
         let title: String
         let poster_path: String?
     }
-
+    
     struct MovieResponse: Codable {
         let results: [Movie]
     }
-
+    
     func fetchMoives(completion: (() -> Void)? = nil) {
         let apiKey = "bbbd0e19cbdae7622268c7375e59a38e"
-        let urlString = "https://api.themoviedb.org/3/movie/upcoming?api_key=\(apiKey)&language=ko-KR&page=1"
-
-        guard let url = URL(string: urlString) else { return }
-
-        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
-            guard let data = data, error == nil else { return }
-
-            do {
-                let decoded = try JSONDecoder().decode(MovieResponse.self, from: data)
-                DispatchQueue.main.async {
-                    self?.movies = decoded.results
-                    completion?()
-                }
-            } catch {
-                print("Failed to decode: \(error)")
+        let categories: [MovieCategory] = MovieCategory.allCases
+        var allMovies: [Movie] = []
+        var completedCount = 0
+        
+        for category in categories {
+            let urlString = "https://api.themoviedb.org/3/movie/\(category.rawValue)?api_key=\(apiKey)&language=ko-KR&page=1"
+            guard let url = URL(string: urlString) else {
+                completedCount += 1
+                continue
             }
-        }.resume()
+            URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
+                if let data = data {
+                    if let decoded = try? JSONDecoder().decode(MovieResponse.self, from: data) {
+                        allMovies.append(contentsOf: decoded.results)
+                    }
+                }
+                completedCount += 1
+                if completedCount == categories.count {
+                    DispatchQueue.main.async {
+                        self?.movies = allMovies
+                        completion?()
+                    }
+                }
+            }.resume()
+        }
     }
     
     public func showSearchTextField() {
