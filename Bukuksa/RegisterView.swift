@@ -43,8 +43,7 @@ class RegisterView: UIView {
             make.width.height.equalTo(50)
         }
 
-        // 상단 bugugsa
-        titleLabel.text = "bugugsa"
+        titleLabel.text = "BUKUKSA"
         titleLabel.font = UIFont.boldSystemFont(ofSize: 20)
         titleLabel.textColor = UIColor.systemBlue
         addSubview(titleLabel)
