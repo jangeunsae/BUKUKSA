@@ -72,7 +72,7 @@ class MainViewController: UIViewController {
         }
 
         loginButton.setTitle("로그인", for: .normal)
-        loginButton.backgroundColor = UIColor(red: 82/255, green: 99/255, blue: 123/255, alpha: 1)
+        loginButton.backgroundColor = UIColor(red: 183/255, green: 28/255, blue: 28/255, alpha: 1)
         loginButton.setTitleColor(.white, for: .normal)
         loginButton.layer.cornerRadius = 25
         loginButton.addTarget(self, action: #selector(loginTapped), for: .touchUpInside)
@@ -85,10 +85,11 @@ class MainViewController: UIViewController {
         }
 
         registerButton.setTitle("회원가입", for: .normal)
-        registerButton.setTitleColor(UIColor(red: 82/255, green: 99/255, blue: 123/255, alpha: 1), for: .normal)
+        registerButton.setTitleColor(.white, for: .normal)
         registerButton.layer.cornerRadius = 25
         registerButton.layer.borderWidth = 1
-        registerButton.layer.borderColor = UIColor(red: 82/255, green: 99/255, blue: 123/255, alpha: 1).cgColor
+        registerButton.backgroundColor = UIColor(red: 211/255, green: 47/255, blue: 47/255, alpha: 1)
+        registerButton.layer.borderColor = UIColor(red: 211/255, green: 47/255, blue: 47/255, alpha: 1).cgColor
         registerButton.addTarget(self, action: #selector(registerTapped), for: .touchUpInside)
         view.addSubview(registerButton)
 

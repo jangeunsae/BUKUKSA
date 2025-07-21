@@ -118,8 +118,6 @@ class InfoPageViewController: UIViewController {
             make.width.equalTo(200)
             make.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
         }
-
-//        fetchMovieData()
     }
 
     @objc private func buttonTapped() {

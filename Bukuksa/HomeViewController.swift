@@ -26,6 +26,7 @@ class HomeViewController: UIViewController {
     var collectionViews: [UICollectionView] = []
     var movieLists: [[MovieData]] = [[], [], [], []]
     let dummyMovieCount = 1
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
