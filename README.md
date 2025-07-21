@@ -30,19 +30,19 @@ BUKUKSA/
 ├── Assets.xcassets              // QR 이미지, 영화 포스터 등
 ```
 
-사용 기술 및 라이브러리
+## 사용 기술 및 라이브러리
 	•	Swift 5, UIKit, SnapKit
 	•	UserDefaults (간단한 사용자/예매 정보 저장)
 	•	Kingfisher (TMDB 이미지 로딩)
 	•	Alamofire (API 통신 구조 포함, 추후 확장 가능)
 
 
-향후 확장 예정 기능
+## 향후 확장 예정 기능
 	•	CoreData 또는 Firebase 기반 사용자 정보 관리
 	•	실시간 예매 좌석 시스템 연동
 	•	Dark Mode 대응
 
-설치 방법
+## 설치 방법
 git clone https://github.com/your-username/BUKUKSA.git
 cd BUKUKSA
 open BUKUKSA.xcodeproj
