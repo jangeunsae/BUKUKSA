@@ -54,7 +54,8 @@ class ProfileView: UIView, UITableViewDelegate, UITableViewDataSource {
         }
         nameLabel.font = .systemFont(ofSize: 30, weight: .bold)
         nameLabel.textColor = .label
-        nameLabel.text = "킹재만" //명균님 View에서 userDeafaults가져와야함
+        let userName = UserDefaults.standard.string(forKey: "userName") ?? "사용자명"
+        nameLabel.text = userName
         
         addSubview(greetingLabel)
         greetingLabel.snp.makeConstraints { make in
