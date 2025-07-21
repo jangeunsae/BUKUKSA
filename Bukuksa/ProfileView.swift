@@ -12,6 +12,10 @@ import SnapKit
 
 class ProfileView: UIView, UITableViewDelegate, UITableViewDataSource {
     
+    override var intrinsicContentSize: CGSize {
+      UIScreen.main.bounds.size
+    }//Preview 삭제시 같이 삭제해줘야함.
+    
     private let profileImageView = UIImageView()
     private let nameLabel = UILabel()
     private let greetingLabel = UILabel()
@@ -20,7 +24,7 @@ class ProfileView: UIView, UITableViewDelegate, UITableViewDataSource {
     private let qrCodeImageView = UIImageView()
     private let reservecontainer = UIView()
     private let qrcontainer = UIView()
-    private let reservationTableView = UITableView()
+    private let profileTableView = UITableView()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -34,19 +38,33 @@ class ProfileView: UIView, UITableViewDelegate, UITableViewDataSource {
     }
     
     private func setupView() {
-        addSubview(profileImageView)
+
+        addSubview(profileTableView)
+        
+        profileTableView.register(ReservationCell.self, forCellReuseIdentifier: "ReservationCell")
+        profileTableView.dataSource = self
+        profileTableView.delegate = self
+        
+        profileTableView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        let headerView = UIView()
+        headerView.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 250)
+        
+        headerView.addSubview(profileImageView)
         profileImageView.snp.makeConstraints { make in
-            make.top.equalTo(profileImageView.safeAreaLayoutGuide).offset(60)
-            make.top.equalToSuperview().offset(80)
-            make.leading.equalToSuperview().offset(10)
+            make.top.equalToSuperview().offset(40)
+            make.leading.equalToSuperview().offset(30)
             make.width.equalTo(100)
             make.height.equalTo(100)
         }
+        
         profileImageView.layer.cornerRadius = 50
         profileImageView.clipsToBounds = true
         profileImageView.backgroundColor = .systemGray5
         
-        addSubview(nameLabel)
+        headerView.addSubview(nameLabel)
         nameLabel.snp.makeConstraints { make in
             make.leading.equalTo(profileImageView.snp.trailing).offset(15)
             make.centerY.equalTo(profileImageView.snp.centerY)
@@ -57,51 +75,38 @@ class ProfileView: UIView, UITableViewDelegate, UITableViewDataSource {
         let userName = UserDefaults.standard.string(forKey: "userName") ?? "사용자명"
         nameLabel.text = userName
         
-        addSubview(greetingLabel)
+        headerView.addSubview(greetingLabel)
         greetingLabel.snp.makeConstraints { make in
-            make.top.equalTo(profileImageView.snp.bottom).offset(10)
+            make.top.equalTo(profileImageView.snp.bottom).offset(15)
             make.leading.equalTo(profileImageView.snp.leading)
-            make.trailing.equalToSuperview().offset(-20)
         }
         greetingLabel.font = .systemFont(ofSize: 15, weight: .bold)
         greetingLabel.textColor = .lightGray
         greetingLabel.text = "부산 국제 영화제를 찾아주셔서 감사합니다."
         
-        addSubview(reservecontainer)
-        reservecontainer.snp.makeConstraints { make in
-            make.top.equalTo(greetingLabel.snp.bottom).offset(40)
+        headerView.addSubview(reservationLabel)
+        reservationLabel.snp.makeConstraints { make in
+            make.top.equalTo(greetingLabel.snp.bottom).offset(20)
             make.leading.equalToSuperview().offset(20)
             make.trailing.equalToSuperview().offset(-20)
             make.height.equalTo(50)
         }
-        reservecontainer.backgroundColor = .systemBlue
-        reservecontainer.layer.cornerRadius = 12
-        reservecontainer.clipsToBounds = true
-        
-        reservecontainer.addSubview(reservationLabel)
-        
-        reservationLabel.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-        }
+        reservationLabel.backgroundColor = .systemBlue
+        reservationLabel.layer.cornerRadius = 12
+        reservationLabel.clipsToBounds = true
         reservationLabel.textColor = .white
         reservationLabel.font = .systemFont(ofSize: 20, weight: .bold)
         reservationLabel.text = "예매내역"
+        reservationLabel.textAlignment = .center
         
-        addSubview(reservationTableView)
-        reservationTableView.register(ReservationCell.self, forCellReuseIdentifier: "ReservationCell")
-        reservationTableView.dataSource = self
-        reservationTableView.delegate = self
+        profileTableView.tableHeaderView = headerView
         
-        reservationTableView.snp.makeConstraints { make in
-            make.top.equalTo(reservecontainer.snp.bottom).offset(10)
-            make.leading.equalToSuperview().offset(20)
-            make.trailing.equalToSuperview().offset(-20)
-            make.height.equalTo(120)
-        }
+        let footerView = UIView()
+        footerView.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 300)
         
-        addSubview(qrcontainer)
+        footerView.addSubview(qrcontainer)
         qrcontainer.snp.makeConstraints { make in
-            make.top.equalTo(reservationTableView.snp.bottom).offset(40)
+            make.top.equalToSuperview().offset(10)
             make.leading.equalToSuperview().offset(20)
             make.trailing.equalToSuperview().offset(-20)
             make.height.equalTo(50)
@@ -120,18 +125,20 @@ class ProfileView: UIView, UITableViewDelegate, UITableViewDataSource {
         qrCodeLabel.font = .systemFont(ofSize: 20, weight: .bold)
         qrCodeLabel.text = "QR CODE"
         
-        addSubview(qrCodeImageView)
+        footerView.addSubview(qrCodeImageView)
         qrCodeImageView.contentMode = .scaleAspectFit
         qrCodeImageView.image = UIImage(named: "QRCode")
         qrCodeImageView.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.centerX.equalToSuperview()
             make.top.equalTo(qrcontainer.snp.bottom).offset(10)
             make.width.equalTo(280)
             make.height.equalTo(280)
-            
         }
+        profileTableView.tableFooterView = footerView
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return 5
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

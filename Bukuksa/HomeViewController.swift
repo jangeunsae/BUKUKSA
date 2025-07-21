@@ -8,6 +8,7 @@ import SnapKit
 class HomeViewController: UIViewController {
     
     let searchingView = SearchingView()
+    let profileView = ProfileView()
     // 상단 버튼들
     let movieListButton = UIButton(type: .system)
     let searchButton = UIButton(type: .system)
@@ -180,6 +181,11 @@ class HomeViewController: UIViewController {
         searchingView.endEditing(true)
         searchingView.hideSearchResults()
         searchingView.hideSearchTextField()
+        view.addSubview(profileView)
+        profileView.snp.makeConstraints { make in
+            make.top.equalTo(profileButton.snp.bottom).offset(10)
+            make.leading.trailing.bottom.equalToSuperview()
+        }
     }
     func clearMovieListView() {
         scrollView.removeFromSuperview()
@@ -187,6 +193,7 @@ class HomeViewController: UIViewController {
         categoryButtons.removeAll()
         collectionViews.removeAll()
         contentView.subviews.forEach { $0.removeFromSuperview() }
+        profileView.removeFromSuperview()
     }
     func updateSelectedButton(_ selected: UIButton) {
         let buttons = [movieListButton, searchButton, profileButton]
