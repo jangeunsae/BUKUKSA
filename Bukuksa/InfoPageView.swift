@@ -15,6 +15,8 @@ struct MovieInfo: Decodable {
 
 class InfoPageViewController: UIViewController {
 
+    var movieData: MovieData?
+
     private var selectedMovieTitle: String?
 
     let titleLabel: UILabel = {
@@ -80,6 +82,17 @@ class InfoPageViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+
+        if let movie = movieData,
+           let path = movie.poster_path,
+           let url = URL(string: "https://image.tmdb.org/t/p/w500\(path)"),
+           let data = try? Data(contentsOf: url) {
+            self.imageView.image = UIImage(data: data)
+            self.titleLabel.text = "선택한 영화"
+            self.descriptionLabel.text = "해당 영화의 설명이 여기에 들어갑니다."
+            self.ratingLabel.text = "평점: -"
+            self.releaseLabel.text = "출시일: -"
+        }
         
         [imageView, titleLabel, descriptionLabel, reservationButton, infoStackView].forEach {
             view.addSubview($0)

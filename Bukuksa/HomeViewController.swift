@@ -273,6 +273,14 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
     func collectionView(_ collectionView: UICollectionView, layout _: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 120, height: 170)
     }
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let index = collectionView.tag
+        guard let movie = movieLists[safe: index]?[indexPath.item] else { return }
+        
+        let infoVC = InfoPageViewController()
+        infoVC.movieData = movie
+        navigationController?.pushViewController(infoVC, animated: true)
+    }
 }
 class MovieCell: UICollectionViewCell {
     static let identifier = "MovieCell"
