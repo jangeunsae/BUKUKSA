@@ -102,7 +102,7 @@ class ProfileView: UIView, UITableViewDelegate, UITableViewDataSource {
         profileTableView.tableHeaderView = headerView
         
         let footerView = UIView()
-        footerView.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 300)
+        footerView.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 400)
         
         footerView.addSubview(qrcontainer)
         qrcontainer.snp.makeConstraints { make in
@@ -132,8 +132,8 @@ class ProfileView: UIView, UITableViewDelegate, UITableViewDataSource {
             make.centerY.equalToSuperview()
             make.centerX.equalToSuperview()
             make.top.equalTo(qrcontainer.snp.bottom).offset(10)
-            make.width.equalTo(280)
-            make.height.equalTo(280)
+            make.width.equalTo(330)
+            make.height.equalTo(330)
         }
         profileTableView.tableFooterView = footerView
     }
