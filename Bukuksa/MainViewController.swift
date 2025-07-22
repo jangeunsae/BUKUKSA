@@ -101,6 +101,7 @@ class MainViewController: UIViewController {
     }
 
     @objc func loginTapped() {
+        view.endEditing(true)
         guard let id = idTextField.text,
               let pw = passwordTextField.text else { return }
 

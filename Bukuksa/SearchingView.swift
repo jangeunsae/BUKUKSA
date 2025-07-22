@@ -34,7 +34,7 @@ class SearchingView: UIView, UITextFieldDelegate, UICollectionViewDelegate, UICo
     }()
     private var movies: [Movie] = []
     private var filteredMovies: [Movie] = []
-    //API를 구현해서 텍스트필드에 입력된 값의 영화제목의 이미지를 가져와야함
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
