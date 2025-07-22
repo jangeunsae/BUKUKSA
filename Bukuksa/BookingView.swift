@@ -180,43 +180,12 @@ class BookingViewController: UIViewController {
                 reservations.append(newReservation)
                 defaults.set(reservations, forKey: "reservations")
                 
-                // Debug print all reservations
-                print("✅ 전체 예매 정보 목록:")
-                for (index, reservation) in reservations.enumerated() {
-                    if let title = reservation["movieTitle"] as? String,
-                       let date = reservation["date"] as? String,
-                       let count = reservation["peopleCount"] as? Int,
-                       let price = reservation["totalPrice"] as? Int {
-                        print("📦 [\(index + 1)] 🎬 \(title), 📅 \(date), 👥 \(count)명, 💰 \(price)원")
-                    }
-                }
-                
                 let homeVC = HomeViewController()
                 self.navigationController?.setViewControllers([homeVC], animated: true)
             }))
             self.present(alert, animated: true)
         }, for: .touchUpInside)
-        
-        
-        //잘 저장됐나 확인 프린트.
-        let defaults = UserDefaults.standard
-        
-        if let reservations = defaults.array(forKey: "reservations") as? [[String: Any]] {
-            print("✅ 전체 예매 정보 목록:")
-            for (index, reservation) in reservations.enumerated() {
-                if let title = reservation["movieTitle"] as? String,
-                   let date = reservation["date"] as? String,
-                   let count = reservation["peopleCount"] as? Int,
-                   let price = reservation["totalPrice"] as? Int {
-                    print("📦 [\(index + 1)] 🎬 \(title), 📅 \(date), 👥 \(count)명, 💰 \(price)원")
-                }
-            }
-        } else {
-            print("⚠️ 저장된 예매 정보가 없습니다.")
-        }
-        
     }
-    
     
     private func updateCurrentTime() {
         let formatter = DateFormatter()
